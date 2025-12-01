@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Wind, Thermometer, Droplets, Gauge, MapPin, Activity, TrendingUp, TrendingDown, AlertCircle, CheckCircle, Info, Brain, Bell, LogOut, Menu, X, LayoutDashboard, Map, BarChart3, Settings, Users, Cloud, Shield, Zap, Eye, Clock, RefreshCw, Sparkles, Leaf, Sun, Moon, Star, Heart, Target, Award, TrendingDown as TrendDown, BarChart, PieChart, LineChart, Globe } from 'lucide-react';
-import { authService } from './auth';
+import { authService } from '../services/auth';
 
 export default function Dashboard() {
   const containerRef = useRef(null);

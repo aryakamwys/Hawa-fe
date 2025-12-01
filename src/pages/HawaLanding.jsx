@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, Wind, MapPin, Bell, TrendingUp, Factory, MessageSquare, Brain, Users, Heart, ArrowRight, Play, Star, Quote, Gauge, Activity, Waves, AirVent, Radio, ScanLine, Leaf, Droplets, Shield, Cloud, UserCircle, LogOut, LayoutDashboard } from 'lucide-react';
-import { authService } from './auth';
+import { authService } from '../services/auth';
 
 export default function HawaLanding() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

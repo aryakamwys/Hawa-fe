@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, Wind } from 'lucide-react';
-import { authService } from './auth';
+import { authService } from '../services/auth';
 
 export default function Login() {
   const containerRef = useRef(null);
@@ -94,18 +94,16 @@ export default function Login() {
     setError('');
     setIsLoading(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const result = authService.login(formData.email, formData.password);
-      
-      if (result.success) {
-        // Redirect to dashboard after successful login
-        window.location.hash = '#dashboard';
-      } else {
-        setError(result.error || t.error);
-        setIsLoading(false);
-      }
-    }, 500);
+    try {
+      await authService.login(formData.email, formData.password);
+      // Redirect ke dashboard setelah login sukses
+      window.location.hash = '#dashboard';
+    } catch (err) {
+      console.error(err);
+      setError(err.message || t.error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Reset animasi saat komponen mount

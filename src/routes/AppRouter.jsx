@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import HawaLanding from './App';
-import Login from './Login';
-import Register from './Register';
-import Dashboard from './Dashboard';
-import SplashScreen from './SplashScreen';
-import { authService } from './auth';
+import HawaLanding from '../pages/HawaLanding.jsx';
+import Login from '../pages/Login.jsx';
+import Register from '../pages/Register.jsx';
+import Dashboard from '../pages/Dashboard.jsx';
+import SplashScreen from '../components/SplashScreen.jsx';
+import { authService } from '../services/auth.js';
 
 export default function AppRouter() {
   const [currentPage, setCurrentPage] = useState('landing');

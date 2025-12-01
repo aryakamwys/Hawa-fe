@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, User, Phone } from 'lucide-react';
-import { authService } from './auth';
+import { authService } from '../services/auth';
 
 export default function Register() {
   const containerRef = useRef(null);
@@ -123,28 +123,34 @@ export default function Register() {
 
     // Validate password length
     if (formData.password.length < 8) {
-      setError(language === 'id' ? 'Kata sandi minimal 8 karakter' : language === 'en' ? 'Password must be at least 8 characters' : 'Kata sandi minimal 8 karakter');
+      setError(
+        language === 'id'
+          ? 'Kata sandi minimal 8 karakter'
+          : language === 'en'
+          ? 'Password must be at least 8 characters'
+          : 'Kata sandi minimal 8 karakter'
+      );
       return;
     }
 
     setIsLoading(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const result = authService.register(
+    try {
+      await authService.register(
         formData.name,
         formData.email,
-        formData.password
+        formData.password,
+        formData.phone,
+        language || 'id'
       );
-      
-      if (result.success) {
-        // Redirect to dashboard after successful registration
-        window.location.hash = '#dashboard';
-      } else {
-        setError(result.error || t.emailExists);
-        setIsLoading(false);
-      }
-    }, 500);
+      // Setelah registrasi sukses, arahkan ke halaman login
+      window.location.hash = '#login';
+    } catch (err) {
+      console.error(err);
+      setError(err.message || t.emailExists);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Reset animasi saat komponen mount
