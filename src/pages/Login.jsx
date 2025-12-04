@@ -96,8 +96,12 @@ export default function Login() {
 
     try {
       await authService.login(formData.email, formData.password);
-      // Redirect ke dashboard setelah login sukses
-      window.location.hash = '#dashboard';
+      // Redirect berdasarkan role user setelah login sukses
+      if (authService.isAdmin()) {
+        window.location.hash = '#admin';
+      } else {
+        window.location.hash = '#dashboard';
+      }
     } catch (err) {
       console.error(err);
       setError(err.message || t.error);
