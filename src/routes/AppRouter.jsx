@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import HawaLanding from '../pages/HawaLanding.jsx';
 import Login from '../pages/Login.jsx';
 import Register from '../pages/Register.jsx';
 import Dashboard from '../pages/Dashboard.jsx';
+import AdminDashboard from '../pages/AdminDashboard.jsx';
 import SplashScreen from '../components/SplashScreen.jsx';
 import { authService } from '../services/auth.js';
 
@@ -10,21 +11,21 @@ export default function AppRouter() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [pageKey, setPageKey] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
 
   // Function to get current page from hash
   const getPageFromHash = () => {
     const hash = window.location.hash.slice(1);
-    if (hash === 'login' || hash === 'register' || hash === 'dashboard') {
+    if (hash === 'login' || hash === 'register' || hash === 'dashboard' || hash === 'admin') {
       return hash;
     }
     return 'landing';
   };
 
   useEffect(() => {
-    // Check authentication status
+    // Check authentication status (for future use if needed)
     const checkAuth = () => {
-      setIsAuthenticated(authService.isAuthenticated());
+      // Auth check is done inline where needed
+      authService.isAuthenticated();
     };
 
     // Set initial page from hash
@@ -34,6 +35,14 @@ export default function AppRouter() {
     if (initialPage === 'dashboard' && !authService.isAuthenticated()) {
       setCurrentPage('login');
       window.location.hash = '#login';
+    } else if (initialPage === 'admin' && !authService.isAuthenticated()) {
+      // Redirect to login if trying to access admin without auth
+      setCurrentPage('login');
+      window.location.hash = '#login';
+    } else if (initialPage === 'admin' && !authService.isAdmin()) {
+      // Redirect to dashboard if not admin
+      setCurrentPage('dashboard');
+      window.location.hash = '#dashboard';
     } else {
       setCurrentPage(initialPage);
     }
@@ -52,17 +61,29 @@ export default function AppRouter() {
         return;
       }
       
-      setCurrentPage((prevPage) => {
-        // Reset key untuk force re-render dan reset animasi setiap kali pindah halaman
-        if (newPage === 'login' || newPage === 'register' || newPage === 'dashboard') {
-          // Selalu update key saat pindah ke halaman untuk reset animasi
-          setPageKey(Date.now());
-        } else if (newPage === 'landing') {
-          // Reset key saat pindah ke landing untuk reset animasi
-          setPageKey(Date.now());
-        }
-        return newPage;
-      });
+      // Protect admin route
+      if (newPage === 'admin' && !authService.isAuthenticated()) {
+        setCurrentPage('login');
+        window.location.hash = '#login';
+        return;
+      }
+      
+      if (newPage === 'admin' && !authService.isAdmin()) {
+        setCurrentPage('dashboard');
+        window.location.hash = '#dashboard';
+        return;
+      }
+      
+      // Reset key untuk force re-render dan reset animasi setiap kali pindah halaman
+      if (newPage === 'login' || newPage === 'register' || newPage === 'dashboard' || newPage === 'admin') {
+        // Selalu update key saat pindah ke halaman untuk reset animasi
+        setPageKey(Date.now());
+      } else if (newPage === 'landing') {
+        // Reset key saat pindah ke landing untuk reset animasi
+        setPageKey(Date.now());
+      }
+      
+      setCurrentPage(newPage);
       
       // Check auth status after navigation
       checkAuth();
@@ -72,7 +93,7 @@ export default function AppRouter() {
     const handleStorageChange = (e) => {
       if (e.key === 'hawa_auth_token') {
         checkAuth();
-        if (currentPage === 'dashboard') {
+        if (currentPage === 'dashboard' || currentPage === 'admin') {
           setCurrentPage('login');
           window.location.hash = '#login';
         }
@@ -117,6 +138,7 @@ export default function AppRouter() {
         {currentPage === 'login' && <Login key={`login-${pageKey}`} />}
         {currentPage === 'register' && <Register key={`register-${pageKey}`} />}
         {currentPage === 'dashboard' && <Dashboard key={`dashboard-${pageKey}`} />}
+        {currentPage === 'admin' && <AdminDashboard key={`admin-${pageKey}`} />}
         {currentPage === 'landing' && <HawaLanding key={`landing-${pageKey}`} />}
       </div>
       

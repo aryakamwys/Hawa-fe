@@ -41,11 +41,29 @@ export const authService = {
       throw new Error('Token tidak ditemukan di response login');
     }
 
-    // sementara simpan minimal email; bisa di-upgrade pakai endpoint /me
-    const userData = { email };
+    // Simpan user data dari response (jika ada) atau minimal email
+    // Backend mungkin mengembalikan user data dengan role
+    let userData = data.user || { email };
+    
+    // Jika response tidak include user data lengkap, simpan minimal email
+    if (!userData.email) {
+      userData.email = email;
+    }
 
     localStorage.setItem(AUTH_KEY, token);
     localStorage.setItem(USER_KEY, JSON.stringify(userData));
+
+    // Coba fetch user data dari /me endpoint jika tersedia (untuk mendapatkan role dll)
+    try {
+      const meData = await authService.getCurrentUserData();
+      if (meData) {
+        userData = meData;
+        localStorage.setItem(USER_KEY, JSON.stringify(userData));
+      }
+    } catch (err) {
+      // Jika /me endpoint tidak tersedia atau error, gunakan data dari login response
+      console.log('Tidak bisa fetch user data dari /me endpoint:', err);
+    }
 
     return { success: true, user: userData, token };
   },
@@ -98,10 +116,50 @@ export const authService = {
   // ambil token saat mau call API lain
   getToken: () => localStorage.getItem(AUTH_KEY),
 
+  // fetch user data dari endpoint /me (jika tersedia)
+  getCurrentUserData: async () => {
+    if (!API_BASE_URL) {
+      return null;
+    }
+
+    const token = authService.getToken();
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (res.ok) {
+        const userData = await handleResponse(res);
+        localStorage.setItem(USER_KEY, JSON.stringify(userData));
+        return userData;
+      }
+    } catch (err) {
+      console.error('Error fetching user data:', err);
+    }
+
+    return null;
+  },
+
   // logout
   logout: () => {
     localStorage.removeItem(AUTH_KEY);
     localStorage.removeItem(USER_KEY);
+  },
+
+  // cek apakah user adalah admin
+  // TODO: Update ini untuk mengambil role dari backend API atau dari user data
+  isAdmin: () => {
+    const user = authService.getCurrentUser();
+    // Sementara cek dari user data, bisa di-upgrade untuk ambil dari backend
+    return user && (user.role === 'admin' || user.is_admin === true);
   }
 };
 
