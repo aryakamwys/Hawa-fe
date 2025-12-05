@@ -9,12 +9,24 @@ export default function AdminSidebar({ isOpen, onClose }) {
   
   // Get current page from hash
   useEffect(() => {
-    const hash = window.location.hash.slice(1);
-    if (hash === 'admin') {
-      setActiveMenu('dashboard');
-    } else if (hash === 'admin/iot-data') {
-      setActiveMenu('iot-data');
-    }
+    const updateActiveMenu = () => {
+      const hash = window.location.hash.slice(1);
+      if (hash === 'admin') {
+        setActiveMenu('dashboard');
+      } else if (hash === 'admin/iot-data') {
+        setActiveMenu('iot-data');
+      }
+    };
+
+    // Update saat mount
+    updateActiveMenu();
+
+    // Listen untuk hash changes
+    window.addEventListener('hashchange', updateActiveMenu);
+
+    return () => {
+      window.removeEventListener('hashchange', updateActiveMenu);
+    };
   }, []);
 
   const handleLogout = () => {

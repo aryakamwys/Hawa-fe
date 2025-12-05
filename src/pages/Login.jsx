@@ -97,9 +97,6 @@ export default function Login() {
     try {
       const result = await authService.login(formData.email, formData.password);
       
-      // Pastikan loading di-reset sebelum redirect
-      setIsLoading(false);
-      
       // Small delay untuk memastikan state sudah update
       setTimeout(() => {
         // Redirect berdasarkan role user setelah login sukses
@@ -112,6 +109,8 @@ export default function Login() {
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message || t.error);
+    } finally {
+      // Pastikan loading selalu di-reset
       setIsLoading(false);
     }
   };
