@@ -3,7 +3,9 @@ import HawaLanding from '../pages/HawaLanding.jsx';
 import Login from '../pages/Login.jsx';
 import Register from '../pages/Register.jsx';
 import Dashboard from '../pages/Dashboard.jsx';
+import Profile from '../pages/Profile.jsx';
 import AdminDashboard from '../pages/AdminDashboard.jsx';
+import AdminIoTData from '../pages/AdminIoTData.jsx';
 import SplashScreen from '../components/SplashScreen.jsx';
 import { authService } from '../services/auth.js';
 
@@ -15,7 +17,14 @@ export default function AppRouter() {
   // Function to get current page from hash
   const getPageFromHash = () => {
     const hash = window.location.hash.slice(1);
-    if (hash === 'login' || hash === 'register' || hash === 'dashboard' || hash === 'admin') {
+    if (
+      hash === 'login' ||
+      hash === 'register' ||
+      hash === 'dashboard' ||
+      hash === 'profile' ||
+      hash === 'admin' ||
+      hash === 'admin/iot-data'
+    ) {
       return hash;
     }
     return 'landing';
@@ -32,14 +41,14 @@ export default function AppRouter() {
     const initialPage = getPageFromHash();
     
     // Redirect to login if trying to access dashboard without auth
-    if (initialPage === 'dashboard' && !authService.isAuthenticated()) {
+    if ((initialPage === 'dashboard' || initialPage === 'profile') && !authService.isAuthenticated()) {
       setCurrentPage('login');
       window.location.hash = '#login';
-    } else if (initialPage === 'admin' && !authService.isAuthenticated()) {
+    } else if ((initialPage === 'admin' || initialPage === 'admin/iot-data') && !authService.isAuthenticated()) {
       // Redirect to login if trying to access admin without auth
       setCurrentPage('login');
       window.location.hash = '#login';
-    } else if (initialPage === 'admin' && !authService.isAdmin()) {
+    } else if ((initialPage === 'admin' || initialPage === 'admin/iot-data') && !authService.isAdmin()) {
       // Redirect to dashboard if not admin
       setCurrentPage('dashboard');
       window.location.hash = '#dashboard';
@@ -55,27 +64,34 @@ export default function AppRouter() {
       const newPage = getPageFromHash();
       
       // Protect dashboard route
-      if (newPage === 'dashboard' && !authService.isAuthenticated()) {
+      if ((newPage === 'dashboard' || newPage === 'profile') && !authService.isAuthenticated()) {
         setCurrentPage('login');
         window.location.hash = '#login';
         return;
       }
       
-      // Protect admin route
-      if (newPage === 'admin' && !authService.isAuthenticated()) {
+      // Protect admin routes
+      if ((newPage === 'admin' || newPage === 'admin/iot-data') && !authService.isAuthenticated()) {
         setCurrentPage('login');
         window.location.hash = '#login';
         return;
       }
       
-      if (newPage === 'admin' && !authService.isAdmin()) {
+      if ((newPage === 'admin' || newPage === 'admin/iot-data') && !authService.isAdmin()) {
         setCurrentPage('dashboard');
         window.location.hash = '#dashboard';
         return;
       }
       
       // Reset key untuk force re-render dan reset animasi setiap kali pindah halaman
-      if (newPage === 'login' || newPage === 'register' || newPage === 'dashboard' || newPage === 'admin') {
+      if (
+        newPage === 'login' ||
+        newPage === 'register' ||
+        newPage === 'dashboard' ||
+        newPage === 'profile' ||
+        newPage === 'admin' ||
+        newPage === 'admin/iot-data'
+      ) {
         // Selalu update key saat pindah ke halaman untuk reset animasi
         setPageKey(Date.now());
       } else if (newPage === 'landing') {
@@ -93,7 +109,7 @@ export default function AppRouter() {
     const handleStorageChange = (e) => {
       if (e.key === 'hawa_auth_token') {
         checkAuth();
-        if (currentPage === 'dashboard' || currentPage === 'admin') {
+        if (currentPage === 'dashboard' || currentPage === 'profile' || currentPage === 'admin' || currentPage === 'admin/iot-data') {
           setCurrentPage('login');
           window.location.hash = '#login';
         }
@@ -138,7 +154,9 @@ export default function AppRouter() {
         {currentPage === 'login' && <Login key={`login-${pageKey}`} />}
         {currentPage === 'register' && <Register key={`register-${pageKey}`} />}
         {currentPage === 'dashboard' && <Dashboard key={`dashboard-${pageKey}`} />}
+        {currentPage === 'profile' && <Profile key={`profile-${pageKey}`} />}
         {currentPage === 'admin' && <AdminDashboard key={`admin-${pageKey}`} />}
+        {currentPage === 'admin/iot-data' && <AdminIoTData key={`admin-iot-data-${pageKey}`} />}
         {currentPage === 'landing' && <HawaLanding key={`landing-${pageKey}`} />}
       </div>
       

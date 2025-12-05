@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Wind, Thermometer, Droplets, Gauge, MapPin, Activity, TrendingUp, TrendingDown, AlertCircle, CheckCircle, Info, Brain, Bell, LogOut, Menu, X, LayoutDashboard, Map, BarChart3, Settings, Users, Cloud, Shield, Zap, Eye, Clock, RefreshCw, Sparkles, Leaf, Sun, Moon, Star, Heart, Target, Award, TrendingDown as TrendDown, BarChart, PieChart, LineChart, Globe } from 'lucide-react';
-import { authService } from '../services/auth';
+import { ArrowLeft, Wind, Thermometer, Droplets, Gauge, MapPin, Activity, TrendingUp, TrendingDown, AlertCircle, CheckCircle, Info, Brain, Bell, Menu, LayoutDashboard, Map, BarChart3, Settings, Cloud, Shield, Zap, Eye, Clock, RefreshCw, Sparkles, Leaf, Sun, Moon, Star, Heart, Target, Award, TrendingDown as TrendDown, BarChart, PieChart, LineChart, Globe } from 'lucide-react';
+import UserSidebar from '../components/UserSidebar';
 
 export default function Dashboard() {
   const containerRef = useRef(null);
@@ -245,116 +245,19 @@ export default function Dashboard() {
   }, []);
 
   const recommendations = getAIRecommendations();
-  const currentUser = authService.getCurrentUser();
-
-  const handleLogout = () => {
-    authService.logout();
-    window.location.hash = '#login';
-  };
-
-  const menuItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: t.menu.dashboard },
-    { id: 'map', icon: Map, label: t.menu.map },
-    { id: 'analytics', icon: BarChart3, label: t.menu.analytics },
-    { id: 'devices', icon: Activity, label: t.menu.devices },
-    { id: 'settings', icon: Settings, label: t.menu.settings }
-  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex">
-      {/* Sidebar */}
-      <aside className={`
-        fixed lg:static inset-y-0 left-0 z-40
-        w-64 bg-white border-r border-gray-200 shadow-lg
-        transform transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-            <div className="flex items-center space-x-2">
-              <img 
-                src="/logo_hawa_fix.png" 
-                alt="HAWA Logo" 
-                className="h-8 w-auto object-contain"
-              />
-              <span className="text-xl font-black text-gray-900">HAWA</span>
-            </div>
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50 flex">
+      {/* User Sidebar */}
+      <UserSidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
 
-          {/* Navigation Menu */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeMenu === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveMenu(item.id);
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`
-                    w-full flex items-center space-x-3 px-4 py-3 rounded-xl
-                    transition-all duration-300 relative group
-                    ${isActive 
-                      ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg shadow-blue-500/30' 
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
-                    }
-                  `}
-                >
-                  <Icon size={20} className={isActive ? 'text-white' : 'text-gray-500 group-hover:text-blue-600'} />
-                  <span className="font-medium text-sm">{item.label}</span>
-                  {isActive && (
-                    <div className="absolute right-3">
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* User Info & Logout */}
-          <div className="p-4 border-t border-gray-200 bg-gray-50">
-            {currentUser && (
-              <div className="mb-3 px-4 py-3 bg-white rounded-xl border border-gray-200 shadow-sm">
-                <div className="flex items-center space-x-2 mb-1">
-                  <Users className="text-blue-600" size={16} />
-                  <p className="text-xs text-gray-500">{t.welcome}</p>
-                </div>
-                <p className="text-sm font-semibold text-gray-900 truncate">{currentUser.name}</p>
-              </div>
-            )}
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-all duration-300 text-sm font-medium shadow-sm"
-            >
-              <LogOut size={16} />
-              <span>{t.logout}</span>
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Sidebar Overlay for Mobile */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-      )}
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Navigation Bar */}
-        <nav className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Navigation Bar - Sticky */}
+        <nav className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center space-x-4">
@@ -371,147 +274,156 @@ export default function Dashboard() {
               </div>
 
               {/* Language Dropdown */}
-              <div className="relative">
+              <div className="flex items-center space-x-3">
                 <button
-                  onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                  className="px-4 py-1.5 pr-8 rounded-full bg-gray-50 text-sm text-gray-700 border border-gray-200 font-medium hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all duration-300 cursor-pointer shadow-sm flex items-center gap-2"
+                  onClick={() => (window.location.hash = '#profile')}
+                  className="hidden sm:inline-flex items-center space-x-2 px-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm font-medium text-gray-700 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-all shadow-sm"
                 >
-                  <Globe className="w-4 h-4" />
-                  <span>{language.toUpperCase()}</span>
-                  <svg 
-                    className={`w-4 h-4 text-gray-600 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <span>Profile</span>
                 </button>
-                
-                {isLangDropdownOpen && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-40" 
-                      onClick={() => setIsLangDropdownOpen(false)}
-                    ></div>
-                    <div className="absolute top-full right-0 mt-2 w-32 bg-white rounded-xl border border-gray-200 shadow-lg z-50 overflow-hidden">
-                      <button
-                        onClick={() => { setLanguage('id'); setIsLangDropdownOpen(false); }}
-                        className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-all ${
-                          language === 'id' 
-                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        ID
-                      </button>
-                      <button
-                        onClick={() => { setLanguage('en'); setIsLangDropdownOpen(false); }}
-                        className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-all ${
-                          language === 'en' 
-                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        EN
-                      </button>
-                      <button
-                        onClick={() => { setLanguage('su'); setIsLangDropdownOpen(false); }}
-                        className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-all ${
-                          language === 'su' 
-                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        SU
-                      </button>
-                    </div>
-                  </>
-                )}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                    className="px-4 py-1.5 pr-8 rounded-full bg-gray-50 text-sm text-gray-700 border border-gray-200 font-medium hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all duration-300 cursor-pointer shadow-sm flex items-center gap-2"
+                  >
+                    <Globe className="w-4 h-4" />
+                    <span>{language.toUpperCase()}</span>
+                    <svg 
+                      className={`w-4 h-4 text-gray-600 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {isLangDropdownOpen && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setIsLangDropdownOpen(false)}
+                      ></div>
+                      <div className="absolute top-full right-0 mt-2 w-32 bg-white rounded-xl border border-gray-200 shadow-lg z-50 overflow-hidden">
+                        <button
+                          onClick={() => { setLanguage('id'); setIsLangDropdownOpen(false); }}
+                          className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-all ${
+                            language === 'id' 
+                              ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          ID
+                        </button>
+                        <button
+                          onClick={() => { setLanguage('en'); setIsLangDropdownOpen(false); }}
+                          className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-all ${
+                            language === 'en' 
+                              ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          EN
+                        </button>
+                        <button
+                          onClick={() => { setLanguage('su'); setIsLangDropdownOpen(false); }}
+                          className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-all ${
+                            language === 'su' 
+                              ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          SU
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </nav>
 
-        {/* Main Content */}
-        <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 overflow-y-auto bg-gray-50">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg shadow-md">
-                <Activity className="text-white" size={24} />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900">
-                  {t.title}
-                </h1>
-                <p className="text-sm sm:text-base text-gray-600 mt-1">
-                  {t.subtitle}
-                </p>
-              </div>
-            </div>
-          </div>
-
-        {/* Air Quality Status Card */}
-        <div className="mb-6 sm:mb-8">
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
-              <div className="flex items-center space-x-3">
-                <div className="p-3 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl">
-                  <Wind className="text-blue-600" size={24} />
+        {/* Main Content Area - Scrollable */}
+        <div className="flex-1 overflow-y-auto bg-gray-50">
+          <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            {/* Header */}
+            <div className="mb-6 sm:mb-8">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg shadow-md">
+                  <Activity className="text-white" size={24} />
                 </div>
                 <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">{t.airQuality}</h2>
-                  <p className="text-sm text-gray-600 flex items-center space-x-1">
-                    <Clock size={14} />
-                    <span>{t.currentStatus}</span>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900">
+                    {t.title}
+                  </h1>
+                  <p className="text-sm sm:text-base text-gray-600 mt-1">
+                    {t.subtitle}
                   </p>
                 </div>
               </div>
-              <div className={`mt-4 sm:mt-0 px-6 py-3 rounded-xl ${getAirQualityColor(sensorData.airQualityLevel)} text-white font-bold text-lg sm:text-xl shadow-lg flex items-center space-x-2`}>
-                <Shield size={20} />
-                <span>{getAirQualityLevel(sensorData.airQualityLevel)}</span>
-              </div>
             </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.pm2_5}</div>
-                  <Cloud className="text-blue-600" size={16} />
-                </div>
-                <div className="text-2xl sm:text-3xl font-black text-blue-600">{Math.round(sensorData.pm2_5_density)}</div>
-                <div className="text-xs text-gray-500 mt-1">μg/m³</div>
-              </div>
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.pm10}</div>
-                  <Cloud className="text-orange-600" size={16} />
-                </div>
-                <div className="text-2xl sm:text-3xl font-black text-orange-600">{Math.round(sensorData.pm10_density)}</div>
-                <div className="text-xs text-gray-500 mt-1">μg/m³</div>
-              </div>
-              <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.temperature}</div>
-                  <Thermometer className="text-red-600" size={16} />
-                </div>
-                <div className="text-2xl sm:text-3xl font-black text-red-600">{sensorData.temperature.toFixed(1)}</div>
-                <div className="text-xs text-gray-500 mt-1">{t.celsius}</div>
-              </div>
-              <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4 border border-cyan-200 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.humidity}</div>
-                  <Droplets className="text-cyan-600" size={16} />
-                </div>
-                <div className="text-2xl sm:text-3xl font-black text-cyan-600">{sensorData.humidity}</div>
-                <div className="text-xs text-gray-500 mt-1">{t.percent}</div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Air Quality Status Card */}
+            <div className="mb-6 sm:mb-8">
+              <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl">
+                      <Wind className="text-blue-600" size={24} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">{t.airQuality}</h2>
+                      <p className="text-sm text-gray-600 flex items-center space-x-1">
+                        <Clock size={14} />
+                        <span>{t.currentStatus}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className={`mt-4 sm:mt-0 px-6 py-3 rounded-xl ${getAirQualityColor(sensorData.airQualityLevel)} text-white font-bold text-lg sm:text-xl shadow-lg flex items-center space-x-2`}>
+                    <Shield size={20} />
+                    <span>{getAirQualityLevel(sensorData.airQualityLevel)}</span>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.pm2_5}</div>
+                      <Cloud className="text-blue-600" size={16} />
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-black text-blue-600">{Math.round(sensorData.pm2_5_density)}</div>
+                    <div className="text-xs text-gray-500 mt-1">μg/m³</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.pm10}</div>
+                      <Cloud className="text-orange-600" size={16} />
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-black text-orange-600">{Math.round(sensorData.pm10_density)}</div>
+                    <div className="text-xs text-gray-500 mt-1">μg/m³</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.temperature}</div>
+                      <Thermometer className="text-red-600" size={16} />
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-black text-red-600">{sensorData.temperature.toFixed(1)}</div>
+                    <div className="text-xs text-gray-500 mt-1">{t.celsius}</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4 border border-cyan-200 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.humidity}</div>
+                      <Droplets className="text-cyan-600" size={16} />
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-black text-cyan-600">{sensorData.humidity}</div>
+                    <div className="text-xs text-gray-500 mt-1">{t.percent}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Sensor Data Cards */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <div className="flex items-center space-x-2 mb-4">
@@ -635,7 +547,8 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-        </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

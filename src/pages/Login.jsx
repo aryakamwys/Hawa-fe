@@ -95,17 +95,22 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await authService.login(formData.email, formData.password);
-      // Redirect berdasarkan role user setelah login sukses
-      if (authService.isAdmin()) {
-        window.location.hash = '#admin';
-      } else {
-        window.location.hash = '#dashboard';
-      }
+      const result = await authService.login(formData.email, formData.password);
+      
+      // Small delay untuk memastikan state sudah update
+      setTimeout(() => {
+        // Redirect berdasarkan role user setelah login sukses
+        if (authService.isAdmin()) {
+          window.location.hash = '#admin';
+        } else {
+          window.location.hash = '#dashboard';
+        }
+      }, 100);
     } catch (err) {
-      console.error(err);
+      console.error('Login error:', err);
       setError(err.message || t.error);
     } finally {
+      // Pastikan loading selalu di-reset
       setIsLoading(false);
     }
   };
